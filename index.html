@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>jio — portfolio</title>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background: #F7F4EF;
+    color: #111;
+  }
+
+  #intro {
+    position: fixed;
+    inset: 0;
+    background: #F7F4EF;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    cursor: pointer;
+    transition: transform 0.9s cubic-bezier(0.76, 0, 0.24, 1);
+  }
+  #intro.slide-up { transform: translateY(-100%); }
+  .intro-circle {
+    width: 120px; height: 120px;
+    border: 1.5px solid #111;
+    border-radius: 50%;
+    margin-bottom: 20px;
+  }
+  .intro-name {
+    font-size: 13px;
+    letter-spacing: 0.25em;
+    font-weight: 400;
+    text-transform: lowercase;
+  }
+  .intro-hint {
+    position: absolute;
+    bottom: 40px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: #aaa;
+    text-transform: uppercase;
+  }
+
+  #nav {
+    position: fixed;
+    top: 40px;
+    left: 48px;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .nav-item {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    cursor: pointer;
+    opacity: 0.18;
+    transition: opacity 0.35s ease;
+    user-select: none;
+    font-weight: 400;
+    color: #111;
+  }
+  .nav-item.active { opacity: 1; }
+
+  .page-title {
+    position: fixed;
+    top: 18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Arial Unicode MS', Arial, sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+    color: #111;
+    z-index: 40;
+    pointer-events: none;
+  }
+
+  #pages {
+    width: 100%; height: 100%;
+    position: relative;
+  }
+
+  /* 기본 페이지 (스크롤 없음) */
+  .page {
+    position: absolute;
+    inset: 0;
+    display: none;
+    padding: 36px 71px 48px 208px;
+  }
+  .page.active { display: block; }
+
+  /* Trend Research: 스크롤 가능 */
+  #page-trend {
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0;
+  }
+  #page-trend::-webkit-scrollbar { display: none; }
+
+  .trend-scroll-inner {
+    padding: 0 71px 80px 208px;
+  }
+
+  /* 각 섹션(페이지) */
+  .trend-section {
+    width: 100%;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(2, calc(50% - 10px - 20px));
+    gap: 35px;
+    padding: 80px 0 20px 0;
+    align-content: center;
+  }
+
+  .page-label {
+    position: fixed;
+    bottom: 36px;
+    left: 48px;
+    font-size: 9px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #bbb;
+    z-index: 30;
+  }
+
+  .box {
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  .box.hidden {
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .box-img {
+    position: absolute;
+    inset: 0;
+    background: #c8c8c8;
+    transition: opacity 0.4s ease;
+  }
+  .box-text {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: #999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    font-weight: 400;
+  }
+  .box:hover .box-img { opacity: 0; }
+  .box:hover .box-text { opacity: 1; }
+</style>
+</head>
+<body>
+
+<div id="intro">
+  <div class="intro-circle"></div>
+  <span class="intro-name">jio</span>
+  <span class="intro-hint">click anywhere</span>
+</div>
+
+<nav id="nav">
+  <span class="nav-item active" data-page="about">About</span>
+  <span class="nav-item" data-page="design">Design</span>
+  <span class="nav-item" data-page="trend">Trend Research</span>
+  <span class="nav-item" data-page="lab">Lab</span>
+</nav>
+
+<div class="page-title">Archive.</div>
+
+<div id="pages">
+  <div class="page active" id="page-about">
+    <span class="page-label">About</span>
+  </div>
+  <div class="page" id="page-design">
+    <span class="page-label">Design</span>
+  </div>
+
+  <!-- TREND RESEARCH: 스크롤 -->
+  <div class="page" id="page-trend">
+    <div class="trend-scroll-inner" id="trend-scroll-inner"></div>
+    <span class="page-label">Trend Research</span>
+  </div>
+
+  <div class="page" id="page-lab">
+    <span class="page-label">Lab</span>
+  </div>
+</div>
+
+<script>
+  document.getElementById('intro').addEventListener('click', () => {
+    document.getElementById('intro').classList.add('slide-up');
+  });
+
+  document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      item.classList.add('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.getElementById('page-' + item.dataset.page).classList.add('active');
+      // Trend Research 진입 시 스크롤 초기화
+      if (item.dataset.page === 'trend') {
+        document.getElementById('page-trend').scrollTop = 0;
+      }
+    });
+  });
+
+  function hasConsecutive4(hiddenSet) {
+    const rows = [[0,1,2,3,4],[5,6,7,8,9]];
+    for (const row of rows) {
+      const h = row.filter(i => hiddenSet.has(i)).sort((a,b) => a-b);
+      for (let i = 0; i <= h.length - 4; i++) {
+        if (h[i+3] - h[i] === 3 &&
+            h[i+1] - h[i] === 1 &&
+            h[i+2] - h[i+1] === 1 &&
+            h[i+3] - h[i+2] === 1) return true;
+      }
+    }
+    return false;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function pickHidden() {
+    let hidden;
+    do {
+      const indices = shuffle(Array.from({length: 10}, (_, i) => i));
+      hidden = new Set(indices.slice(0, 4));
+    } while (hasConsecutive4(hidden));
+    return hidden;
+  }
+
+  function buildSection() {
+    const section = document.createElement('div');
+    section.className = 'trend-section';
+    const hidden = pickHidden();
+    for (let i = 0; i < 10; i++) {
+      const box = document.createElement('div');
+      box.className = 'box' + (hidden.has(i) ? ' hidden' : '');
+      box.innerHTML = '<div class="box-img"></div><div class="box-text">blank</div>';
+      section.appendChild(box);
+    }
+    return section;
+  }
+
+  const inner = document.getElementById('trend-scroll-inner');
+  for (let s = 0; s < 20; s++) {
+    inner.appendChild(buildSection());
+  }
+</script>
+</body>
+</html>
