@@ -90,7 +90,6 @@
     position: relative;
   }
 
-  /* 기본 페이지 (스크롤 없음) */
   .page {
     position: absolute;
     inset: 0;
@@ -99,20 +98,18 @@
   }
   .page.active { display: block; }
 
-  /* Trend Research: 스크롤 가능 */
-  #page-trend {
+  #page-research {
     overflow-y: auto;
     overflow-x: hidden;
     padding: 0;
   }
-  #page-trend::-webkit-scrollbar { display: none; }
+  #page-research::-webkit-scrollbar { display: none; }
 
-  .trend-scroll-inner {
+  .research-scroll-inner {
     padding: 0 71px 80px 208px;
   }
 
-  /* 각 섹션(페이지) */
-  .trend-section {
+  .research-section {
     width: 100%;
     height: 100vh;
     display: grid;
@@ -178,7 +175,7 @@
 <nav id="nav">
   <span class="nav-item active" data-page="about">About</span>
   <span class="nav-item" data-page="design">Design</span>
-  <span class="nav-item" data-page="trend">Trend Research</span>
+  <span class="nav-item" data-page="research">Research</span>
   <span class="nav-item" data-page="lab">Lab</span>
 </nav>
 
@@ -192,10 +189,9 @@
     <span class="page-label">Design</span>
   </div>
 
-  <!-- TREND RESEARCH: 스크롤 -->
-  <div class="page" id="page-trend">
-    <div class="trend-scroll-inner" id="trend-scroll-inner"></div>
-    <span class="page-label">Trend Research</span>
+  <div class="page" id="page-research">
+    <div class="research-scroll-inner" id="research-scroll-inner"></div>
+    <span class="page-label">Research</span>
   </div>
 
   <div class="page" id="page-lab">
@@ -214,9 +210,8 @@
       item.classList.add('active');
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('page-' + item.dataset.page).classList.add('active');
-      // Trend Research 진입 시 스크롤 초기화
-      if (item.dataset.page === 'trend') {
-        document.getElementById('page-trend').scrollTop = 0;
+      if (item.dataset.page === 'research') {
+        document.getElementById('page-research').scrollTop = 0;
       }
     });
   });
@@ -254,7 +249,7 @@
 
   function buildSection() {
     const section = document.createElement('div');
-    section.className = 'trend-section';
+    section.className = 'research-section';
     const hidden = pickHidden();
     for (let i = 0; i < 10; i++) {
       const box = document.createElement('div');
@@ -265,7 +260,7 @@
     return section;
   }
 
-  const inner = document.getElementById('trend-scroll-inner');
+  const inner = document.getElementById('research-scroll-inner');
   for (let s = 0; s < 20; s++) {
     inner.appendChild(buildSection());
   }
